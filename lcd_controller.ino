@@ -383,7 +383,19 @@ temporaryVentile.fM = ventiles[ventileSelected].fM;
   while (activeButton == 0) {
       blinkLed();
       lcd.setCursor(0, 0);
-      sprintf(displayArray, "S%02d:%02d F%02d:%02d V%d", temporaryVentile.sH, temporaryVentile.sM, temporaryVentile.fH, temporaryVentile.fM, ventileSelected);
+      
+      char saved;
+      if (temporaryVentile.sH == ventiles[ventileSelected].sH
+       && temporaryVentile.sM == ventiles[ventileSelected].sM
+       && temporaryVentile.fH == ventiles[ventileSelected].fH
+       && temporaryVentile.fM == ventiles[ventileSelected].fM) {
+        saved = 'y';
+      } else {
+        saved = 'n';
+      }
+      
+      sprintf(displayArray, "S%02d:%02d F%02d:%02d V%d S%c", temporaryVentile.sH, temporaryVentile.sM, temporaryVentile.fH,
+              temporaryVentile.fM, ventileSelected, saved);
       lcd.print(displayArray);
       lcd.setCursor(0, 1);
       lcd.print(selectTime);
