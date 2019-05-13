@@ -337,9 +337,14 @@ void menuItem1() { // Function executes when you select the 1st item from main m
              lcd.print("Time:  ");
              lcd.print(rtc.getTimeStr());
              
-             lcd.setCursor(0,1);
-             lcd.print("Date: ");
-             lcd.print(rtc.getDateStr());
+//              lcd.setCursor(0,1);
+//              lcd.print("Date: ");
+//              lcd.print(rtc.getDateStr());
+              // debug ventile. delete later
+              lcd.setCursor(0, 1);
+              sprintf(displayArray, "DBG S%02d:%02d F%02d:%02d", ventiles[0].sH, ventiles[0].sM,
+                      ventiles[0].fH, ventiles[0].fM);
+              lcd.print(displayArray);
              
              delay(1000); 
     int button;
