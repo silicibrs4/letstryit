@@ -402,8 +402,13 @@ temporaryVentile.fM = ventiles[ventileSelected].fM;
       sprintf(displayArray, "S%02d:%02d F%02d:%02d V%d S%c", temporaryVentile.sH, temporaryVentile.sM, temporaryVentile.fH,
               temporaryVentile.fM, ventileSelected, saved);
       lcd.print(displayArray);
+      
       lcd.setCursor(0, 1);
-      lcd.print(selectTime);
+      sprintf(displayArray, "S%02d:%02d F%02d:%02d T%d", ventiles[ventileSelected].sH, ventiles[ventileSelected].sM,
+              ventiles[ventileSelected].fH, ventiles[ventileSelected].fM, selectTime);
+      lcd.print(displayArray);
+      
+      lcd.print();
     int button;
     readKey = analogRead(0);
     if (readKey < 790) {
