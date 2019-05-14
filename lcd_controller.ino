@@ -77,10 +77,10 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 int led=0; //declare pin 2 is led
 char displayArray[16];
         typedef struct ventile {
-        char sH;   
-        char sM;
-        char fH;
-        char fM;
+        int sH;   
+        int sM;
+        int fH;
+        int fM;
         } ventile_t;
         
 ventile_t ventiles[2];
@@ -363,11 +363,11 @@ void menuItem1() { // Function executes when you select the 1st item from main m
   }
 }
 
-char incr(char *number, char mod) {
+void incr(char *int, int mod) {
   *number = (*number + 1) % mod;
 }
 
-char decr(char *number, char mod) {
+void decr(int *number, int mod) {
   if(*number == 0) 
   {*number = mod-1;}
   else { *number = (*number - 1) % mod; }
