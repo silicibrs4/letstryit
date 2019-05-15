@@ -363,7 +363,7 @@ void menuItem1() { // Function executes when you select the 1st item from main m
   }
 }
 
-void incr(char *int, int mod) {
+void incr(int *number, int mod) {
   *number = (*number + 1) % mod;
 }
 
