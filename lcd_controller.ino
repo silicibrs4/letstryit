@@ -75,24 +75,30 @@ DS3231  rtc(SDA, SCL);
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);  
  //create array which is for 2 ventile with 1 temporary values 
 int led=0; //declare pin 2 is led
+int ledTwo=2;
 char displayArray[16];
         typedef struct ventile {
-        int sH;   
-        int sM;
-        int fH;
-        int fM;
+        char sH;   
+        char sM;
+        char fH;
+        char fM;
         } ventile_t;
         
 ventile_t ventiles[2];
 
 void setup() {
+    Serial.begin(9600);
         // trying for start end hours
-      //  ventiles[0].sH = 8;
-      //  ventiles[0].sM = 30;
-      //  ventiles[0].fH = 8;
-      //  ventiles[0].fM = 34;
-  pinMode(0, OUTPUT);
-
+        ventiles[0].sH = 8;
+        ventiles[0].sM = 30;
+        ventiles[0].fH = 9;
+        ventiles[0].fM = 00;
+        ventiles[1].sH = 9;
+        ventiles[1].sM = 05;
+        ventiles[1].fH = 10;
+        ventiles[1].fM = 05;
+  pinMode(led, OUTPUT);
+  pinMode(ledTwo, OUTPUT);
   // Initializes and clears the LCD screen
   rtc.begin(); // Initialize the rtc object
   //The following lines can be uncommented to set the date and time
@@ -110,8 +116,9 @@ void setup() {
 
 }
 void blinkLed(){
+ 
    // TODO for all ventiles
-
+      digitalWrite(led, LOW);
 int r = rtc.getTime().hour*60 +rtc.getTime().min;
 int s = ventiles[0].sH*60 + ventiles[0].sM;
 int f = ventiles[0].fH*60 + ventiles[0].fM;
@@ -140,12 +147,43 @@ int f = ventiles[0].fH*60 + ventiles[0].fM;
     }
 
 }
+void blinkLedTwo(){
+   // TODO for all ventiles
+      digitalWrite(led, LOW);
+int r = rtc.getTime().hour*60 +rtc.getTime().min;
+int s = ventiles[1].sH*60 + ventiles[1].sM;
+int f = ventiles[1].fH*60 + ventiles[1].fM;
 
+//    lcd.setCursor(0, 0);
+//     sprintf(displayArray, "R%d S%d F%d",  rtc.getTime().min, ventiles[0].sM, ventiles[0].fM);
+//    lcd.print(displayArray);
+//    lcd.setCursor(0, 1);
+//     sprintf(displayArray, "R%d S%d F%d",  rtc.getTime().hour, ventiles[0].sH, ventiles[0].fH);
+//    lcd.print(displayArray);
+//    lcd.setCursor(0, 0);
+//     sprintf(displayArray, "R%d S%d",  r, s);
+//    lcd.print(displayArray);
+//    lcd.setCursor(0, 1);
+//     sprintf(displayArray, "F%d",  f);
+//    lcd.print(displayArray);
+
+//   if (
+//    ventiles[0].sH <= rtc.getTime().hour && rtc.getTime().hour <= ventiles[0].fH
+//   &&
+//   ventiles[0].sM <= rtc.getTime().min && rtc.getTime().min < ventiles[0].fM) {
+    if (s<r&&r<f) {
+      digitalWrite(ledTwo, HIGH);
+   } else {
+      digitalWrite(ledTwo, LOW);
+    }
+
+}
 void loop() {
   mainMenuDraw();
   drawCursor();
   operateMainMenu();
   blinkLed();
+  blinkLedTwo();
 }
 
 // This function will generate the 2 menu items that can fit on the screen. They will change as you scroll through your menu. Up and down arrows will indicate your current menu position.
@@ -206,6 +244,7 @@ void operateMainMenu() {
   int activeButton = 0;
   while (activeButton == 0) {
     blinkLed();
+    blinkLedTwo();
     int button;
     readKey = analogRead(0);
     if (readKey < 790) {
@@ -332,19 +371,15 @@ void menuItem1() { // Function executes when you select the 1st item from main m
   int activeButton = 0;
   while (activeButton == 0) {
              blinkLed();
+             blinkLedTwo();
              lcd.clear();
              lcd.setCursor(0,0);
              lcd.print("Time:  ");
              lcd.print(rtc.getTimeStr());
              
-//              lcd.setCursor(0,1);
-//              lcd.print("Date: ");
-//              lcd.print(rtc.getDateStr());
-              // debug ventile. delete later
-              lcd.setCursor(0, 1);
-              sprintf(displayArray, "DBG S%02d:%02d F%02d:%02d", ventiles[0].sH, ventiles[0].sM,
-                      ventiles[0].fH, ventiles[0].fM);
-              lcd.print(displayArray);
+             lcd.setCursor(0,1);
+             lcd.print("Date: ");
+             lcd.print(rtc.getDateStr());
              
              delay(1000); 
     int button;
@@ -363,11 +398,11 @@ void menuItem1() { // Function executes when you select the 1st item from main m
   }
 }
 
-void incr(int *number, int mod) {
+char incr(char *number, char mod) {
   *number = (*number + 1) % mod;
 }
 
-void decr(int *number, int mod) {
+char decr(char *number, char mod) {
   if(*number == 0) 
   {*number = mod-1;}
   else { *number = (*number - 1) % mod; }
@@ -387,28 +422,14 @@ temporaryVentile.fM = ventiles[ventileSelected].fM;
 
   while (activeButton == 0) {
       blinkLed();
+      blinkLedTwo();
       lcd.setCursor(0, 0);
-      
-      char saved;
-      if (temporaryVentile.sH == ventiles[ventileSelected].sH
-       && temporaryVentile.sM == ventiles[ventileSelected].sM
-       && temporaryVentile.fH == ventiles[ventileSelected].fH
-       && temporaryVentile.fM == ventiles[ventileSelected].fM) {
-        saved = 'y';
-      } else {
-        saved = 'n';
-      }
-      
-      sprintf(displayArray, "S%02d:%02d F%02d:%02d V%d S%c", temporaryVentile.sH, temporaryVentile.sM, temporaryVentile.fH,
-              temporaryVentile.fM, ventileSelected, saved);
+      sprintf(displayArray, "S%02d:%02d F%02d:%02d V%d", temporaryVentile.sH, temporaryVentile.sM, temporaryVentile.fH, temporaryVentile.fM, ventileSelected);
       lcd.print(displayArray);
-      
+        Serial.println(displayArray);
+                Serial.println(rtc.getTemp());
       lcd.setCursor(0, 1);
-      sprintf(displayArray, "S%02d:%02d F%02d:%02d T%d", ventiles[ventileSelected].sH, ventiles[ventileSelected].sM,
-              ventiles[ventileSelected].fH, ventiles[ventileSelected].fM, selectTime);
-      lcd.print(displayArray);
-      
-      lcd.print();
+      lcd.print(selectTime);
     int button;
     readKey = analogRead(0);
     if (readKey < 790) {
@@ -469,6 +490,7 @@ temporaryVentile.fM = ventiles[ventileSelected].fM;
 
 void menuItem2() { // Function executes when you select the 2nd item from main menu
   subMenuVentile(0);
+  
 }
 
 void menuItem3() { // Function executes when you select the 3rd item from main menu
@@ -484,6 +506,7 @@ void menuItem4() { // Function executes when you select the 4th item from main m
 
   while (activeButton == 0) {
       blinkLed();
+      blinkLedTwo();
     int button;
     readKey = analogRead(0);
     if (readKey < 790) {
@@ -507,7 +530,7 @@ void menuItem5() { // Function executes when you select the 5th item from main m
   lcd.setCursor(3, 0);
   lcd.print("Sub Menu 5");
 
-  while (activeButton == 0) {  blinkLed();
+  while (activeButton == 0) {  blinkLed(); blinkLedTwo();
     int button;
     readKey = analogRead(0);
     if (readKey < 790) {
@@ -531,7 +554,7 @@ void menuItem6() { // Function executes when you select the 6th item from main m
   lcd.setCursor(3, 0);
   lcd.print("Sub Menu 6");
 
-  while (activeButton == 0) {  blinkLed();
+  while (activeButton == 0) {  blinkLed(); blinkLedTwo();
     int button;
     readKey = analogRead(0);
     if (readKey < 790) {
@@ -555,7 +578,7 @@ void menuItem7() { // Function executes when you select the 7th item from main m
   lcd.setCursor(3, 0);
   lcd.print("Sub Menu 7");
 
-  while (activeButton == 0) {   blinkLed();
+  while (activeButton == 0) {   blinkLed(); blinkLedTwo();
     int button;
     readKey = analogRead(0);
     if (readKey < 790) {
@@ -579,7 +602,7 @@ void menuItem8() { // Function executes when you select the 8th item from main m
   lcd.setCursor(3, 0);
   lcd.print("Sub Menu 8");
 
-  while (activeButton == 0) {   blinkLed();
+  while (activeButton == 0) {   blinkLed(); blinkLedTwo();
     int button;
     readKey = analogRead(0);
     if (readKey < 790) {
@@ -603,7 +626,7 @@ void menuItem9() { // Function executes when you select the 9th item from main m
   lcd.setCursor(3, 0);
   lcd.print("Sub Menu 9");
 
-  while (activeButton == 0) {   blinkLed();
+  while (activeButton == 0) {   blinkLed(); blinkLedTwo();
     int button;
     readKey = analogRead(0);
     if (readKey < 790) {
@@ -627,7 +650,7 @@ void menuItem10() { // Function executes when you select the 10th item from main
   lcd.setCursor(3, 0);
   lcd.print("Sub Menu 10");
 
-  while (activeButton == 0) {  blinkLed();
+  while (activeButton == 0) {  blinkLed(); blinkLedTwo();
     int button;
     readKey = analogRead(0);
     if (readKey < 790) {
